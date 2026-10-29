@@ -6,7 +6,11 @@ public enum AppInfo {
     public static let contactEmail = "duola8789@126.com"
     public static let repositoryURL = "https://github.com/duola8789/breather"
 
-    /// Public JSON with {"version", "url"}. Kept in a gist because the source
-    /// repository is private, so its Releases API is not anonymously readable.
-    public static let updateFeedURL = "https://gist.githubusercontent.com/duola8789/ec17499928fc74cf061f46a75f7df12d/raw/breather-version.json"
+    /// GitHub's public Releases API. The repository is public, so this is
+    /// readable without a token; it always reflects the latest actual release,
+    /// so there is no separate version file to keep in sync.
+    /// The API is authoritative but rate limited to 60 requests/hour per IP,
+    /// which a shared corporate NAT can exhaust; the static JSON is the backup.
+    public static let updateFeedURL = "https://api.github.com/repos/duola8789/breather/releases/latest"
+    public static let updateFeedFallbackURL = "https://gist.githubusercontent.com/duola8789/ec17499928fc74cf061f46a75f7df12d/raw/breather-version.json"
 }
