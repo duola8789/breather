@@ -25,20 +25,33 @@ macOS 菜单栏休息提醒工具。工作一段时间后自动进入休息，�
 
 ### 提示"无法验证开发者"怎么办
 
-本应用**没有通过 Apple 公证**（需要付费的 Developer ID 证书），从浏览器下载的副本会被 Gatekeeper 拦下，
-提示「Apple 无法验证 Breather.app 是否包含可能危害 Mac 的恶意软件」。这不是病毒，是分发方式所致。
+本应用**没有通过 Apple 公证**（需要付费的 Developer ID 证书），所以 Gatekeeper 会拦。这不是病毒，是分发方式所致。
 
-三种解法，任选其一：
+拦截可能出现在**两个位置**，对应的解法不同：
 
-- **系统设置 → 隐私与安全性**，页面下方找到「已阻止使用 Breather」的提示，点 **仍要打开**，再确认一次；
-- **在访达里右键点 Breather.app → 打开**，弹窗里再点一次「打开」；
-- **终端去掉隔离属性**：
+- 双击打开 DMG 时被拦——隔离属性在 **DMG 文件**上
+- 拖进「应用程序」后首次启动 app 时被拦——属性被继承到了 **app** 上
 
-  ```bash
-  xattr -dr com.apple.quarantine /Applications/Breather.app
-  ```
+**方法一：图形界面放行**
 
-> 用命令行下载（`curl`、`brew`）的副本不会带隔离属性，不会触发上述拦截。
+- DMG 被拦：在访达里**右键点 DMG → 打开**，弹窗里再点一次「打开」
+- app 被拦：**右键点 Breather.app → 打开**；或到 `系统设置 → 隐私与安全性`，页面下方点「仍要打开」
+
+**方法二：终端去掉隔离属性**
+
+针对下载下来的 DMG（把文件名替换成你实际下载的版本）：
+
+```bash
+xattr -d com.apple.quarantine ~/Downloads/Breather-1.0.1.dmg
+```
+
+如果已经拖进「应用程序」、启动时仍被拦，再对 app 本身执行一次：
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Breather.app
+```
+
+> 用命令行下载的文件（`curl`、`brew`）不会带上隔离属性，因此不会触发拦截。
 
 ## 从源码构建
 
