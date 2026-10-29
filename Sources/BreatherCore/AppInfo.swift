@@ -10,7 +10,8 @@ public enum AppInfo {
     /// readable without a token; it always reflects the latest actual release,
     /// so there is no separate version file to keep in sync.
     /// The API is authoritative but rate limited to 60 requests/hour per IP,
-    /// which a shared corporate NAT can exhaust; the static JSON is the backup.
+    /// which a shared corporate NAT can exhaust. The releases page redirects to
+    /// the latest tag and is not subject to that limit, so it is the backup.
     public static let updateFeedURL = "https://api.github.com/repos/duola8789/breather/releases/latest"
-    public static let updateFeedFallbackURL = "https://gist.githubusercontent.com/duola8789/ec17499928fc74cf061f46a75f7df12d/raw/breather-version.json"
+    public static let updateFeedFallbackURL = "https://github.com/duola8789/breather/releases/latest"
 }

@@ -43,9 +43,11 @@ enum UpdateChecker {
             return
         }
 
-        fetch(primaryURL) { primary in
+        fetchJSON(primaryURL) { primary in
             if case .failed = primary, let fallback = URL(string: AppInfo.updateFeedFallbackURL) {
-                fetch(fallback) { result in
+                // `/releases/latest` redirects to `/releases/tag/vX.Y.Z`; the
+                // final URL carries the version without touching the REST API.
+                fetchLatestTag(from: fallback) { result in
                     queue.async { completion(result) }
                 }
             } else {
@@ -54,7 +56,35 @@ enum UpdateChecker {
         }
     }
 
-    private static func fetch(_ url: URL, completion: @escaping (Outcome) -> Void) {
+    private static func fetchLatestTag(from url: URL, completion: @escaping (Outcome) -> Void) {
+        var request = URLRequest(url: url)
+        request.httpMethod = "HEAD"
+        request.timeoutInterval = 10
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+
+        URLSession.shared.dataTask(with: request) { _, response, error in
+            if let error {
+                completion(.failed(error.localizedDescription))
+                return
+            }
+            guard
+                let finalURL = response?.url,
+                let tag = finalURL.pathComponents.last(where: { $0.hasPrefix("v") })
+            else {
+                completion(.failed("no release tag found"))
+                return
+            }
+
+            let version = String(tag.dropFirst())
+            if Version.isNewer(version, than: AppInfo.version) {
+                completion(.updateAvailable(version: version, url: finalURL))
+            } else {
+                completion(.upToDate(current: AppInfo.version))
+            }
+        }.resume()
+    }
+
+    private static func fetchJSON(_ url: URL, completion: @escaping (Outcome) -> Void) {
         var request = URLRequest(url: url)
         request.timeoutInterval = 10
         request.cachePolicy = .reloadIgnoringLocalCacheData
