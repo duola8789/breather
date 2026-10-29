@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: swift --version
+
+      - name: Test
+        run: swift test
+
+      - name: Build app bundle
+        run: Scripts/build-app.sh
+
+      - name: Package
+        run: |
+          cd dist
+          DMG=$(ls Breather-*.dmg | head -1)
+          shasum -a 256 "$DMG" > "$DMG.sha256"
+          cat "$DMG.sha256"
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            dist/Breather-*.dmg dist/Breather-*.dmg.sha256 \
+            --title "Breather ${GITHUB_REF_NAME}" \
+            --generate-notes \
+            --notes "构建自 \`${GITHUB_SHA::7}\`。安装：下载 DMG，打开后把 Breather 拖进「应用程序」。首次打开若提示「无法验证开发者」，在系统设置 → 隐私与安全性里点「仍要打开」。"
