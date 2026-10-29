@@ -9,11 +9,10 @@ final class MainPanelController {
 
     private let titleLabel = NSTextField(labelWithString: "")
     private let menuButton = NSButton()
-    private let slider = NSSlider()
+    private let slider = AnimalSliderView()
     private let actionButton = NSButton()
 
     private var globalMonitor: Any?
-    private var isSyncingSlider = false
 
     var onStateChange: (() -> Void)?
     var onShowMenu: ((NSView) -> Void)?
@@ -72,9 +71,8 @@ final class MainPanelController {
 
         titleLabel.stringValue = title(phase: state.phase, remaining: remaining)
 
-        isSyncingSlider = true
-        slider.doubleValue = engine.progress(at: now)
-        isSyncingSlider = false
+        slider.icon = preferences.sliderIcon
+        slider.progress = engine.progress(at: now)
 
         actionButton.title = localized(state.isPaused ? "Resume" : "Pause")
         let inBreakPhase = state.phase == .work || state.phase == .rest
@@ -115,9 +113,8 @@ final class MainPanelController {
         onStateChange?()
     }
 
-    @objc private func sliderChanged() {
-        guard !isSyncingSlider else { return }
-        engine.setProgress(slider.doubleValue, now: Date())
+    private func sliderChanged(_ value: Double) {
+        engine.setProgress(value, now: Date())
         refresh()
         onStateChange?()
     }
@@ -205,13 +202,8 @@ final class MainPanelController {
         menuButton.action = #selector(menuTapped)
         menuButton.refusesFirstResponder = true
 
-        slider.frame = NSRect(x: inset, y: body.height - 58, width: body.width - inset * 2, height: 18)
-        slider.minValue = 0
-        slider.maxValue = 1
-        slider.isContinuous = true
-        slider.controlSize = .small
-        slider.target = self
-        slider.action = #selector(sliderChanged)
+        slider.frame = NSRect(x: inset, y: body.height - 58, width: body.width - inset * 2, height: AnimalSliderView.height)
+        slider.onDrag = { [weak self] value in self?.sliderChanged(value) }
 
         let buttonWidth: CGFloat = 96
         actionButton.frame = NSRect(x: (body.width - buttonWidth) / 2, y: 14, width: buttonWidth, height: 22)

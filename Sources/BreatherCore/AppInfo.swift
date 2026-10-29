@@ -1,7 +1,7 @@
 import Foundation
 
 public enum AppInfo {
-    public static let version = "1.0.1"
+    public static let version = "1.1.0"
     public static let bundleIdentifier = "com.duola8789.Breather"
     public static let contactEmail = "duola8789@126.com"
     public static let repositoryURL = "https://github.com/duola8789/breather"

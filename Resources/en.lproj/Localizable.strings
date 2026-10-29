@@ -72,3 +72,10 @@
 "CheckingForUpdates" = "Checking for updates…";
 "UpdateFailed" = "Update check failed: %@";
 "OK" = "OK";
+"SliderIcon" = "Slider icon";
+"IconTortoise" = "Tortoise";
+"IconDog" = "Dog";
+"IconCat" = "Cat";
+"IconPerson" = "Person";
+"IconHare" = "Rabbit";
+"TimeRemainingProgress" = "Time remaining";

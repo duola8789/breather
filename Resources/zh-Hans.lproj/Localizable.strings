@@ -72,3 +72,10 @@
 "CheckingForUpdates" = "正在检查更新…";
 "UpdateFailed" = "检查更新失败：%@";
 "OK" = "好";
+"SliderIcon" = "滑块图标";
+"IconTortoise" = "乌龟";
+"IconDog" = "小狗";
+"IconCat" = "小猫";
+"IconPerson" = "小人";
+"IconHare" = "兔子";
+"TimeRemainingProgress" = "剩余时间进度";

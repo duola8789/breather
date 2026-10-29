@@ -15,10 +15,11 @@ final class PreferencesWindowController: NSWindowController {
     private let forceBreak = NSButton(checkboxWithTitle: "", target: nil, action: nil)
     private let appearancePopup = NSPopUpButton()
     private let colorWell = NSColorWell()
+    private let iconPopup = NSPopUpButton()
     private let languagePopup = NSPopUpButton()
 
     private static let width: CGFloat = 420
-    private static let height: CGFloat = 452
+    private static let height: CGFloat = 496
     private static let margin: CGFloat = 24
     private static let labelWidth: CGFloat = 104
     private static let valueWidth: CGFloat = 52
@@ -74,6 +75,8 @@ final class PreferencesWindowController: NSWindowController {
         colorWell.color = storedColor()
         colorWell.isEnabled = preferences.panelAppearance == "custom"
 
+        iconPopup.selectItem(at: SliderIcon.allCases.firstIndex(of: preferences.sliderIcon) ?? 0)
+
         let languages = L10n.availableLanguages()
         languagePopup.selectItem(at: languages.firstIndex(of: preferences.appLanguage) ?? 0)
     }
@@ -120,6 +123,11 @@ final class PreferencesWindowController: NSWindowController {
             preferences.panelColor = nil
         }
 
+        let icons = SliderIcon.allCases
+        if iconPopup.indexOfSelectedItem >= 0, iconPopup.indexOfSelectedItem < icons.count {
+            preferences.sliderIcon = icons[iconPopup.indexOfSelectedItem]
+        }
+
         let languages = L10n.availableLanguages()
         if languagePopup.indexOfSelectedItem >= 0,
            languagePopup.indexOfSelectedItem < languages.count {
@@ -144,6 +152,16 @@ final class PreferencesWindowController: NSWindowController {
         let notice = NSAlert()
         notice.messageText = L10n.t("SavedPreferences")
         notice.runModal()
+    }
+
+    private func iconTitle(_ icon: SliderIcon) -> String {
+        switch icon {
+        case .tortoise: return L10n.t("IconTortoise")
+        case .dog: return L10n.t("IconDog")
+        case .cat: return L10n.t("IconCat")
+        case .person: return L10n.t("IconPerson")
+        case .hare: return L10n.t("IconHare")
+        }
     }
 
     private func buildUI() {
@@ -178,49 +196,54 @@ final class PreferencesWindowController: NSWindowController {
         let fieldX = Self.margin + Self.labelWidth + 12
         let fieldWidth = Self.width - Self.margin - Self.valueWidth - 10 - fieldX
 
-        header("时长", y: 404)
+        header("时长", y: 448)
 
-        label(L10n.t("ExpectedWorkPeriod"), y: 374)
-        workSlider.frame = NSRect(x: fieldX, y: 372, width: fieldWidth, height: 20)
+        label(L10n.t("ExpectedWorkPeriod"), y: 418)
+        workSlider.frame = NSRect(x: fieldX, y: 416, width: fieldWidth, height: 20)
         configure(slider: workSlider, min: 1, max: 120)
         workValue.frame = NSRect(
-            x: Self.width - Self.margin - Self.valueWidth, y: 374,
+            x: Self.width - Self.margin - Self.valueWidth, y: 418,
             width: Self.valueWidth, height: 17
         )
         styleValue(workValue, font: labelFont)
         content.addSubview(workValue)
 
-        label(L10n.t("ExpectedBreakPeriod"), y: 344)
-        breakSlider.frame = NSRect(x: fieldX, y: 342, width: fieldWidth, height: 20)
+        label(L10n.t("ExpectedBreakPeriod"), y: 388)
+        breakSlider.frame = NSRect(x: fieldX, y: 386, width: fieldWidth, height: 20)
         configure(slider: breakSlider, min: 1, max: 60)
         breakValue.frame = NSRect(
-            x: Self.width - Self.margin - Self.valueWidth, y: 344,
+            x: Self.width - Self.margin - Self.valueWidth, y: 388,
             width: Self.valueWidth, height: 17
         )
         styleValue(breakValue, font: labelFont)
         content.addSubview(breakValue)
 
-        divider(y: 326)
+        divider(y: 370)
 
-        header("启动与显示", y: 300)
-        configure(checkbox: startAtLogin, title: L10n.t("StartAtLogin"), y: 272)
-        configure(checkbox: alwaysOnTop, title: L10n.t("KeepThisPopoverOnTop"), y: 246)
-        configure(checkbox: ringBell, title: L10n.t("RingBellWhenStarting"), y: 220)
-        configure(checkbox: forceBreak, title: L10n.t("ForceBreak"), y: 194)
+        header("启动与显示", y: 344)
+        configure(checkbox: startAtLogin, title: L10n.t("StartAtLogin"), y: 316)
+        configure(checkbox: alwaysOnTop, title: L10n.t("KeepThisPopoverOnTop"), y: 290)
+        configure(checkbox: ringBell, title: L10n.t("RingBellWhenStarting"), y: 264)
+        configure(checkbox: forceBreak, title: L10n.t("ForceBreak"), y: 238)
 
-        divider(y: 176)
+        divider(y: 220)
 
-        header("外观与语言", y: 150)
+        header("外观与语言", y: 194)
 
-        label("面板背景", y: 120)
-        appearancePopup.frame = NSRect(x: fieldX, y: 116, width: 150, height: 24)
+        label("面板背景", y: 164)
+        appearancePopup.frame = NSRect(x: fieldX, y: 160, width: 150, height: 24)
         appearancePopup.addItems(withTitles: ["跟随系统", "浅色", "深色", "自定义"])
         appearancePopup.target = self
         appearancePopup.action = #selector(appearanceChanged)
         content.addSubview(appearancePopup)
 
-        colorWell.frame = NSRect(x: fieldX + 162, y: 116, width: 44, height: 24)
+        colorWell.frame = NSRect(x: fieldX + 162, y: 160, width: 44, height: 24)
         content.addSubview(colorWell)
+
+        label(L10n.t("SliderIcon"), y: 124)
+        iconPopup.frame = NSRect(x: fieldX, y: 120, width: 150, height: 24)
+        iconPopup.addItems(withTitles: SliderIcon.allCases.map(iconTitle))
+        content.addSubview(iconPopup)
 
         label(L10n.t("Language"), y: 84)
         languagePopup.frame = NSRect(x: fieldX, y: 80, width: 150, height: 24)

@@ -29,6 +29,7 @@ public final class Preferences {
         public static let panelRed = "panelRed"
         public static let panelGreen = "panelGreen"
         public static let panelBlue = "panelBlue"
+        public static let sliderIcon = "sliderIcon"
     }
 
     /// Defaults mirror the values the reference implementation ships with.
@@ -56,6 +57,7 @@ public final class Preferences {
         public static let usingSystemScreenLock = false
         public static let appLanguage = "system"
         public static let panelAppearance = "system"
+        public static let sliderIcon = SliderIcon.default.rawValue
     }
 
     private let defaults: UserDefaults
@@ -153,6 +155,13 @@ public final class Preferences {
     public var appLanguage: String {
         get { defaults.string(forKey: Key.appLanguage) ?? Defaults.appLanguage }
         set { defaults.set(newValue, forKey: Key.appLanguage) }
+    }
+
+    /// Icon drawn as the main panel slider's thumb. Unknown stored values
+    /// resolve to the default instead of failing.
+    public var sliderIcon: SliderIcon {
+        get { SliderIcon(stored: defaults.string(forKey: Key.sliderIcon) ?? "") }
+        set { defaults.set(newValue.rawValue, forKey: Key.sliderIcon) }
     }
 
     /// "system" | "light" | "dark" | "custom"

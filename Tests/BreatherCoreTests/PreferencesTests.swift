@@ -31,6 +31,7 @@ final class PreferencesTests: XCTestCase {
         XCTAssertTrue(prefs.ringBellOnBreakStart)
         XCTAssertTrue(prefs.ringBellOnBreakEnd)
         XCTAssertFalse(prefs.autoCloseBreakOverlay)
+        XCTAssertEqual(prefs.sliderIcon, .tortoise)
     }
 
     func testReadingDoesNotWrite() {
@@ -45,6 +46,7 @@ final class PreferencesTests: XCTestCase {
         _ = prefs.ringBellOnBreakStart
         _ = prefs.ringBellOnBreakEnd
         _ = prefs.autoCloseBreakOverlay
+        _ = prefs.sliderIcon
 
         let stored = defaults.persistentDomain(forName: suiteName) ?? [:]
         XCTAssertTrue(stored.isEmpty, "reading preferences must not persist anything, got: \(stored)")
@@ -56,12 +58,20 @@ final class PreferencesTests: XCTestCase {
         writer.breakPeriod = 8
         writer.forceBreak = true
         writer.autoCloseBreakOverlay = true
+        writer.sliderIcon = .hare
 
         let reader = Preferences(defaults: UserDefaults(suiteName: suiteName)!)
         XCTAssertEqual(reader.workPeriod, 30)
         XCTAssertEqual(reader.breakPeriod, 8)
         XCTAssertTrue(reader.forceBreak)
         XCTAssertTrue(reader.autoCloseBreakOverlay)
+        XCTAssertEqual(reader.sliderIcon, .hare)
         XCTAssertEqual(reader.postponePeriod, 5, "untouched keys keep their defaults")
+    }
+
+    func testUnknownSliderIconFallsBackToDefault() {
+        defaults.set("dragon", forKey: Preferences.Key.sliderIcon)
+        let prefs = Preferences(defaults: defaults)
+        XCTAssertEqual(prefs.sliderIcon, .tortoise)
     }
 }
